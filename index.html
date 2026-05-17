@@ -511,7 +511,7 @@
 
                 // Envoie les données au script Google Sheets via une requête POST
 
-                const response = await fetch(SCRIPT_URL, {
+                await fetch(SCRIPT_URL, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -519,10 +519,8 @@
                     body: JSON.stringify(donneesVisite)
                 });
                 
-                const result = await response.json();
-
-                console.log(result);
-                return result.success;
+                console.log("Visite enregistrée");
+                return true;
             } catch (error) {
                 console.error("Erreur lors de l'enregistrement:", error);
                 return false;
