@@ -497,10 +497,16 @@
                 const now = new Date();
                 const dateString = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
 
+                // Déduction automatique de la classe basée sur l'identifiant
+                let classeUtilisateur = "Inconnue";
+                if (nomUtilisateur === "5CG4") classeUtilisateur = "Classe 5C (G4)";
+                else if (nomUtilisateur === "5DG2") classeUtilisateur = "Classe 5D (G2)";
+                else if (nomUtilisateur === "Ami") classeUtilisateur = "Administration";
+                
                 // Construit l'objet contenant toutes les données de la visite
                 const donneesVisite = {
                     nom: nomUtilisateur,
-                    classe: nomUtilisateur,
+                    classe: classeUtilisateur,
                     date: dateString,
                     appareil: `${deviceInfo.deviceType} (${deviceInfo.os})`,
                     ip: ip,
@@ -511,16 +517,22 @@
 
                 // Envoie les données au script Google Sheets via une requête POST
 
-                await fetch(SCRIPT_URL, {
+                const response = await fetch(SCRIPT_URL, {
                     method: "POST",
+                    mode: "cors",
                     headers: {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify(donneesVisite)
                 });
-                
-                console.log("Visite enregistrée");
-                return true;
+                const jsonResult = await response.json();
+                if(jsonResult.success) {
+                    console.log("Visite enregistrée");
+                    return true;
+                } else {
+                    console.error("Erreur renvoyée par le script :", jsonResult.error);
+                     return false;
+                }
             } catch (error) {
                 console.error("Erreur lors de l'enregistrement:", error);
                 return false;
@@ -692,10 +704,19 @@
             if (confirm("⚠️ Attention ! Supprimer TOUT l'historique ? Cette action est irréversible.")) {
                 try {
                     // Envoie une requête pour effacer les données
-                    await fetch(SCRIPT_URL + '?action=clear', { method: 'POST' });
-                    alert("✅ Historique effacé !");
-                    // Recharge les statistiques pour mettre à jour l'affichage
-                    await chargerStatistiquesCloud();
+                    const response = await fetch(SCRIPT_URL + '?action=clear', { 
+                        method: 'POST',
+                        mode: 'cors',
+                        headers: { "Content-Type": "text/plain" } 
+                    });
+                    const res = await response.json();
+                    if (res.success) {
+                        alert("✅ Historique effacé !");
+                        // Recharge les statistiques pour mettre à jour l'affichage
+                        await chargerStatistiquesCloud();
+                    } else {
+                        alert("Erreur: " + res.error);
+                    }
                 } catch (error) {
                     console.error("Erreur lors de l'effacement:", error);
                     alert("Erreur lors de l'effacement");
