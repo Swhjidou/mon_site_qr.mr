@@ -413,7 +413,7 @@
         // ==========================================
         // ⚠️ REMPLACEZ CETTE URL PAR CELLE DE VOTRE GOOGLE APPS SCRIPT APRÈS DÉPLOIEMENT
         // Cette URL permet la communication entre votre site et Google Sheets
-        constSCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCKh52ULwvRdly_PGkyZHtJFCV_abCXmlqGaELiTPdHsgbNeiY6YAi5_gIdj-70cWB/exec"
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCKh52ULwvRdly_PGkyZHtJFCV_abCXmlqGaELiTPdHsgbNeiY6YAi5_gIdj-70cWB/exec"
 
         // ==========================================
         // FONCTION: getDeviceInfo()
@@ -515,9 +515,6 @@
                 // mode: "no-cors" évite les problèmes de sécurité CORS
                 await fetch(SCRIPT_URL, {
                     method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(donneesVisite)
                 });
                 
                 console.log("Visite enregistrée avec succès dans le cloud !");
@@ -526,6 +523,16 @@
                 console.error("Erreur lors de l'enregistrement:", error);
                 return false;
             }
+        }
+
+        function ConstructionReponseJSON(objet) {
+        return ContentService
+            .createTextOutput(JSON.stringify(objet))
+            .setMimeType(ContentService.MimeType.JSON);
+        }
+
+        function doOptions() {
+        return ContentService.createTextOutput("");
         }
 
         // ==========================================
