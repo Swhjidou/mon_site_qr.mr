@@ -540,6 +540,12 @@
                 const response = await fetch(SCRIPT_URL + '?action=getData');
                 const toutesLesVisites = await response.json();
                 
+                        
+                // Vérifier que c'est bien un tableau
+                if (!Array.isArray(toutesLesVisites)) {
+                    console.error("Données reçues non valides:", toutesLesVisites);
+                    return null;
+                }
                 // Calcul du nombre total de visites
                 const totalVisites = toutesLesVisites.length;
                 
